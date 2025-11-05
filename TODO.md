@@ -1,0 +1,3 @@
+- [x] Ganti API key YouTube dengan placeholder dan tambahkan instruksi untuk mendapatkan key yang valid
+- [x] Tambahkan penanganan error yang lebih baik untuk API key dan pencarian
+- [x] Test aplikasi dengan membuka index.html di browser dan coba cari serta putar lagu

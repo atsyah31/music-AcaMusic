@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AcaMusic - Simple & Elegant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Brich';
+            src: url('Brich.ttf') format('truetype');
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,12 +19,12 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #6e849a 0%, #e2e8f0 100%);
+            background: url('Download autumn forest in the mountains Created with AI for free.jpeg') no-repeat center center fixed;
+            background-size: cover;
             color: #334155;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-        }
 
         .header {
             background: rgba(255, 255, 255, 0.95);
@@ -40,6 +45,16 @@
             font-weight: 600;
             color: #1e293b;
             letter-spacing: -0.025em;
+        }
+
+        .logo span {
+            font-family: 'Brich', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #9d9999, #bfa908);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .logo img {
@@ -89,14 +104,14 @@
         .hero-title {
             font-size: 2.5rem;
             font-weight: 700;
-            color: #1e293b;
+            color: #eff1f4;
             margin-bottom: 0.5rem;
             letter-spacing: -0.025em;
         }
 
         .hero-subtitle {
             font-size: 1.125rem;
-            color: #64748b;
+            color: #d4d4d4;
             font-weight: 400;
         }
 
@@ -219,6 +234,24 @@
             justify-content: center;
             gap: 1rem;
             margin-bottom: 1rem;
+        }
+
+        .loop-btn {
+            background: #f8fafc;
+            color: #64748b;
+        }
+
+        .loop-btn.active {
+            background: #3b82f6;
+            color: #ffffff;
+        }
+
+        .loop-btn.loop-one .loop-icon {
+            opacity: 0.5;
+        }
+
+        .loop-btn.loop-all .loop-icon {
+            opacity: 1;
         }
 
         .control-btn {
@@ -612,6 +645,11 @@
                         <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
                     </svg>
                 </button>
+                <button class="control-btn loop-btn" id="loop-btn">
+                    <svg class="loop-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 4V2.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.35V6c3.31 0 6 2.69 6 6 0 .79-.15 1.56-.44 2.25-.15.36-.04.77.23 1.05.51.51 1.37.33 1.64-.34.37-1.04.6-2.16.6-3.31 0-4.42-4.03-8-9-8zm0 14c-3.31 0-6-2.69-6-6 0-.79.15-1.56.44-2.25.15-.36.04-.77-.23-1.05-.51-.51-1.37-.33-1.64.34-.37 1.04-.6 2.16-.6 3.31 0 4.42 4.03 8 9 8V20.21c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.8-2.79c-.31-.31-.85-.09-.85.35V18z"/>
+                    </svg>
+                </button>
             </div>
 
             <div class="progress-container">
@@ -652,6 +690,7 @@
         var playlist = [];
         var userPlaylist = [];
         var progressInterval = null;
+        var loopMode = 'none'; // 'none', 'all', 'one'
 
         // Load YouTube IFrame Player API
         var tag = document.createElement('script');
@@ -698,13 +737,34 @@
                 // Start progress update interval
                 if (progressInterval) clearInterval(progressInterval);
                 progressInterval = setInterval(updateProgress, 1000);
-            } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+            } else if (event.data === YT.PlayerState.PAUSED) {
                 // Stop progress update interval
                 if (progressInterval) {
                     clearInterval(progressInterval);
                     progressInterval = null;
                 }
                 updateProgress(); // Update one final time
+            } else if (event.data === YT.PlayerState.ENDED) {
+                // Stop progress update interval
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                }
+                updateProgress(); // Update one final time
+
+                // Handle looping
+                if (loopMode === 'one') {
+                    // Replay current track
+                    player.playVideo();
+                } else if (loopMode === 'all') {
+                    // Play next track
+                    if (currentTrackIndex < playlist.length - 1) {
+                        playVideoByIndex(currentTrackIndex + 1);
+                    } else {
+                        playVideoByIndex(0);
+                    }
+                }
+                // If loopMode is 'none', do nothing (stop)
             }
         }
 
@@ -918,6 +978,26 @@
                 player.setVolume(e.target.value);
             } catch (error) {
                 console.error('Error setting volume:', error);
+            }
+        });
+
+        document.getElementById('loop-btn').addEventListener('click', () => {
+            const loopBtn = document.getElementById('loop-btn');
+            if (loopMode === 'none') {
+                loopMode = 'all';
+                loopBtn.classList.add('active');
+                loopBtn.classList.remove('loop-one');
+                loopBtn.classList.add('loop-all');
+            } else if (loopMode === 'all') {
+                loopMode = 'one';
+                loopBtn.classList.add('active');
+                loopBtn.classList.remove('loop-all');
+                loopBtn.classList.add('loop-one');
+            } else {
+                loopMode = 'none';
+                loopBtn.classList.remove('active');
+                loopBtn.classList.remove('loop-one');
+                loopBtn.classList.remove('loop-all');
             }
         });
 

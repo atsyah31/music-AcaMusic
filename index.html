@@ -115,12 +115,39 @@
             transition: all 0.2s ease;
             cursor: pointer;
             border: 1px solid #f1f5f9;
+            position: relative;
         }
 
         .music-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
             border-color: #e2e8f0;
+        }
+
+        .add-to-playlist-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.9);
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .music-card:hover .add-to-playlist-btn {
+            opacity: 1;
+        }
+
+        .add-to-playlist-btn:hover {
+            background: #2563eb;
         }
 
         .music-image {
@@ -278,6 +305,152 @@
             cursor: pointer;
         }
 
+        .playlist-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .playlist-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #475569;
+        }
+
+        .playlist-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .playlist-content {
+            background: #ffffff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .playlist-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .playlist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .playlist-item:hover {
+            background: #e2e8f0;
+        }
+
+        .playlist-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+        }
+
+        .playlist-item-info {
+            flex: 1;
+        }
+
+        .playlist-item-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .playlist-item-artist {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background: #fee2e2;
+        }
+
+        .empty-playlist {
+            text-align: center;
+            color: #94a3b8;
+            padding: 3rem;
+        }
+
         .loading {
             text-align: center;
             padding: 3rem;
@@ -387,6 +560,12 @@
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Cari lagu, artis, atau album...">
         </div>
+        <button class="playlist-btn" id="playlist-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L15.5,5.5L16.92,4.08L21.5,8.67L27.08,3.08L28.5,4.5L21.5,11.5Z"/>
+            </svg>
+            Playlist
+        </button>
         <div class="volume-control">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 9V15H7L12 20V4L7 9H3Z"/>
@@ -447,6 +626,19 @@
         </section>
     </main>
 
+    <!-- Playlist Modal -->
+    <div class="playlist-modal" id="playlist-modal">
+        <div class="playlist-content">
+            <div class="playlist-header">
+                <h2 class="playlist-title">Playlist Anda</h2>
+                <button class="close-btn" id="close-playlist">&times;</button>
+            </div>
+            <div class="playlist-items" id="playlist-items">
+                <div class="empty-playlist">Playlist Anda kosong. Tambahkan lagu dari hasil pencarian.</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hidden YouTube Player -->
     <div id="player"></div>
 
@@ -458,6 +650,7 @@
         var currentVideoId = null;
         var currentTrackIndex = -1;
         var playlist = [];
+        var userPlaylist = [];
         var progressInterval = null;
 
         // Load YouTube IFrame Player API
@@ -608,6 +801,11 @@
                 musicCard.onclick = () => playVideoByIndex(index);
 
                 musicCard.innerHTML = `
+                    <button class="add-to-playlist-btn" onclick="event.stopPropagation(); addToPlaylist('${videoId}', '${title.replace(/'/g, "\\'")}', '${channelTitle.replace(/'/g, "\\'")}', '${thumbnail}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                    </button>
                     <img src="${thumbnail}" alt="${title}" class="music-image" onerror="this.src='https://via.placeholder.com/280x200/f8fafc/64748b?text=Music'">
                     <div class="music-title">${title.length > 50 ? title.substring(0, 50) + '...' : title}</div>
                     <div class="music-artist">${channelTitle}</div>
@@ -720,6 +918,87 @@
                 player.setVolume(e.target.value);
             } catch (error) {
                 console.error('Error setting volume:', error);
+            }
+        });
+
+        // Playlist functionality
+        function addToPlaylist(videoId, title, artist, thumbnail) {
+            // Check if song is already in playlist
+            const existingIndex = userPlaylist.findIndex(song => song.videoId === videoId);
+            if (existingIndex !== -1) {
+                alert('Lagu ini sudah ada di playlist Anda.');
+                return;
+            }
+
+            // Add to playlist
+            userPlaylist.push({
+                videoId: videoId,
+                title: title,
+                artist: artist,
+                thumbnail: thumbnail
+            });
+
+            alert(`"${title}" telah ditambahkan ke playlist Anda.`);
+            console.log('Playlist updated:', userPlaylist);
+            updatePlaylistDisplay();
+        }
+
+        function removeFromPlaylist(index) {
+            if (index >= 0 && index < userPlaylist.length) {
+                const removedSong = userPlaylist.splice(index, 1)[0];
+                alert(`"${removedSong.title}" telah dihapus dari playlist Anda.`);
+                updatePlaylistDisplay();
+            }
+        }
+
+        function updatePlaylistDisplay() {
+            const playlistItemsContainer = document.getElementById('playlist-items');
+            playlistItemsContainer.innerHTML = '';
+
+            if (userPlaylist.length === 0) {
+                playlistItemsContainer.innerHTML = '<div class="empty-playlist">Playlist Anda kosong. Tambahkan lagu dari hasil pencarian.</div>';
+                return;
+            }
+
+            userPlaylist.forEach((song, index) => {
+                const playlistItem = document.createElement('div');
+                playlistItem.className = 'playlist-item';
+                playlistItem.onclick = () => playVideo(song.videoId, song.title, song.artist, song.thumbnail);
+
+                playlistItem.innerHTML = `
+                    <img src="${song.thumbnail}" alt="${song.title}" onerror="this.src='https://via.placeholder.com/50x50/f8fafc/64748b?text=♪'">
+                    <div class="playlist-item-info">
+                        <div class="playlist-item-title">${song.title.length > 30 ? song.title.substring(0, 30) + '...' : song.title}</div>
+                        <div class="playlist-item-artist">${song.artist}</div>
+                    </div>
+                    <button class="remove-btn" onclick="event.stopPropagation(); removeFromPlaylist(${index})">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                        </svg>
+                    </button>
+                `;
+
+                playlistItemsContainer.appendChild(playlistItem);
+            });
+        }
+
+        // Playlist modal functionality
+        document.getElementById('playlist-btn').addEventListener('click', () => {
+            const modal = document.getElementById('playlist-modal');
+            modal.classList.add('show');
+            updatePlaylistDisplay();
+        });
+
+        document.getElementById('close-playlist').addEventListener('click', () => {
+            const modal = document.getElementById('playlist-modal');
+            modal.classList.remove('show');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('playlist-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'playlist-modal') {
+                const modal = document.getElementById('playlist-modal');
+                modal.classList.remove('show');
             }
         });
 
